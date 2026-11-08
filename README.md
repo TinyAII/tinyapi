@@ -2,52 +2,56 @@
 
 # TinyAPI
 
-**免费 · 开源 · 146+ 个 API 接口**
+**面向开发者的 API 在线调试平台 · 353 个 RESTful 接口**
 
-[![Website](https://img.shields.io/badge/网站-api.tinyaii.top-blue?style=flat-square)](https://api.tinyaii.top)
-[![APIs](https://img.shields.io/badge/APIs-146+-green?style=flat-square)](https://api.tinyaii.top/apis)
+[![Website](https://img.shields.io/badge/%E7%BD%91%E7%AB%99-api.tinyaii.cn-blue?style=flat-square)](https://api.tinyaii.cn)
+[![APIs](https://img.shields.io/badge/APIs-353-green?style=flat-square)](https://api.tinyaii.cn/docs)
 [![License](https://img.shields.io/badge/license-MIT-yellow?style=flat-square)](LICENSE)
 [![Rust](https://img.shields.io/badge/Built%20with-Rust-orange?style=flat-square)](https://www.rust-lang.org/)
 
-RESTful 标准 · JSON 格式 · GET/POST 双方式 · 注册即用 · 无需付费
+RESTful 标准 · JSON 统一返回 · GET / POST 双方式 · 浏览器直接调试
 
-[快速开始](#快速开始) · [API 分类](#api-分类) · [文档](https://api.tinyaii.top/docs) · [在线调试](https://api.tinyaii.top/apis)
+[快速开始](#快速开始) · [热门接口](#热门接口) · [接口分类](#接口分类) · [文档](https://api.tinyaii.cn/docs)
 
 </div>
 
 ---
 
-## 什么是 TinyAPI？
+## 什么是 TinyAPI
 
-TinyAPI 是一个免费的 API 接口聚合平台，提供 146+ 个开箱即用的 API，覆盖短视频解析、AI 搜索、天气查询、IP 定位、二维码生成、翻译、加密解密等 18 个分类。
+TinyAPI 把分散在各处的数据能力整理成统一的调用方式：同一个域名、同一套鉴权、同一种返回格式。
 
-**适合谁？** 个人开发者、学生项目、初创团队、独立站长——任何需要快速接入 API 的人。
+做应用时经常需要一些零散的数据能力——查一个城市的天气、解析一条短视频链接、取一次热榜。这些能力原本分散在不同的服务商手里，每接一家就要注册一次账号、读一遍文档、处理一套不同的错误码。TinyAPI 把这些整理成 353 个接口，开发者只需申请一个 API Key，就能按路径调用。
+
+**适合谁**：需要快速接入数据能力的个人开发者、学生项目、独立站长。
 
 ---
 
 ## 快速开始
 
-### 1. 注册获取 API Key
+### 1. 获取 API Key
 
-访问 [api.tinyaii.top/user](https://api.tinyaii.top/user) 注册账号，获取免费 API Key。
+在 [用户中心](https://api.tinyaii.cn/user) 注册，账号信息中会自动生成 API Key。
 
 ### 2. 发起请求
 
-**GET 方式：**
+API Key 通过请求头传递：
+
 ```bash
-curl "https://api.tinyaii.top/v1/quote" \
-  -H "Authorization: Bearer sk_your_api_key"
+curl "https://api.tinyaii.cn/v1/quote" \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-**POST 方式（所有 API 同时支持）：**
+也可以放在 URL 参数里：
+
 ```bash
-curl -X POST "https://api.tinyaii.top/v1/quote" \
-  -H "Authorization: Bearer sk_your_api_key" \
-  -H "Content-Type: application/json" \
-  -d '{}'
+curl "https://api.tinyaii.cn/v1/quote?apikey=YOUR_API_KEY"
 ```
 
-**返回格式：**
+所有接口同时支持 GET 和 POST。
+
+### 3. 返回格式
+
 ```json
 {
   "code": 200,
@@ -59,113 +63,101 @@ curl -X POST "https://api.tinyaii.top/v1/quote" \
 }
 ```
 
+**注意**：业务状态码在响应体的 `code` 字段，**HTTP 状态恒为 200**。判断调用是否成功请读 `code`，不要看 HTTP 状态码。数据在 `data`，错误原因在 `message`。
+
 ---
 
-## 热门接口示例
+## 热门接口
 
-### 🎬 聚合短视频解析
-
-支持 1000+ 平台（TikTok、YouTube、B站、Twitter、Pinterest 等）。
+### 天气查询
 
 ```bash
-curl "https://api.tinyaii.top/v1/video/parse2?url=https://vt.tiktok.com/ZSxQ2JsN6/" \
-  -H "Authorization: Bearer sk_your_api_key"
+curl "https://api.tinyaii.cn/v1/weather?city=北京&apikey=YOUR_KEY"
 ```
 
 ```json
 {
   "code": 200,
   "data": {
-    "title": "视频标题",
-    "platform": "tiktok",
-    "items": [
-      {"type": "video", "url": "https://..."},
-      {"type": "image", "url": "https://..."}
-    ]
+    "city": "北京",
+    "temp": "18",
+    "weather": "晴",
+    "forecast": [ ... ]
   }
 }
 ```
 
-### 🔍 智能搜索
+### 短视频聚合解析
 
-AI 驱动的网页搜索，支持智能问答。
+支持抖音、TikTok、YouTube、哔哩哔哩等平台，返回无水印地址、封面与作者信息。
 
 ```bash
-curl "https://api.tinyaii.top/v1/web/search?query=今天天气" \
-  -H "Authorization: Bearer sk_your_api_key"
+curl "https://api.tinyaii.cn/v1/video/parse2?url=https://vt.tiktok.com/ZSxQ2JsN6/&apikey=YOUR_KEY"
 ```
 
-```json
-{
-  "code": 200,
-  "data": {
-    "query": "今天天气",
-    "answer": "今天全国大部分地区晴好，气温适宜。",
-    "results": [
-      {"title": "天气预报", "url": "https://...", "content": "...", "score": 0.95}
-    ]
-  }
-}
-```
+### 聚合热榜
 
-### 🎤 语音转文字
-
-支持 MP3/WAV/M4A/OGG/FLAC，最大 25MB。
+聚合知乎、微博、哔哩哔哩、GitHub 等平台的实时热榜。
 
 ```bash
-curl "https://api.tinyaii.top/v1/audio/asr?url=https://example.com/audio.mp3" \
-  -H "Authorization: Bearer sk_your_api_key"
+curl "https://api.tinyaii.cn/v1/hot?apikey=YOUR_KEY"
 ```
 
-```json
-{
-  "code": 200,
-  "data": {
-    "text": "识别出的文字内容"
-  }
-}
+### IP 归属地
+
+```bash
+curl "https://api.tinyaii.cn/v1/ip?ip=8.8.8.8&apikey=YOUR_KEY"
+```
+
+### 二维码生成
+
+```bash
+curl "https://api.tinyaii.cn/v1/qrcode?text=https://example.com&apikey=YOUR_KEY"
 ```
 
 ---
 
-## API 分类
+## 接口分类
 
-| 分类 | 数量 | 示例接口 |
-|------|------|----------|
-| 🎮 游戏 | 20 | 原神随机图片、明日方舟干员查询、王者荣耀战力 |
-| 🎲 趣味 | 14 | 毒鸡汤、彩虹屁、春联生成、歇后语 |
-| 🎨 随机图片 | 14 | 原神/崩坏/明日方舟/海贼王等壁纸 |
-| 🚗 生活 | 12 | 油价查询、农历、星座运势、历史上的今天 |
-| 🤖 AI | 12 | 智能搜索、语音转文字、动漫搜番、AI对话 |
-| 📝 文本 | 11 | 文本统计、拼音转换、MD5/SHA256、JSON格式化 |
-| 🛠️ 开发 | 10 | 二维码生成、DNS查询、Favicon获取、IP查询 |
-| 🔥 热榜 | 9 | 聚合热榜、微博热搜、B站热门、GitHub趋势 |
-| 🔒 加密 | 9 | AES/RSA/DES加密解密、Base64编解码 |
-| 🌐 网络 | 6 | IP归属地、天气查询、WHOIS查询 |
-| 💬 社交 | 5 | B站视频信息、微博用户信息 |
-| 🎬 视频 | 3 | 聚合短视频解析（1000+平台）|
-| 🎵 音乐 | 4 | 网易云音乐解析/搜索/排行榜 |
-| 📦 其他 | 8 | 快递查询、油价、短链接生成 |
+| 分类 | 数量 | 示例 |
+|------|------|------|
+| 🎮 游戏数据 | 131 | 原神/星铁/绝区零兑换码、Steam 价格与在线人数、三角洲行动图鉴 |
+| 🛠️ 实用工具 | 74 | 二维码、DNS 查询、WHOIS、MD5/SHA256、JSON 格式化、快递查询 |
+| 🖼️ 图片壁纸 | 51 | 多主题随机壁纸、二次元插画 |
+| 📺 内容解析 | 43 | 短视频解析、B 站视频信息、网易云音乐、各平台热榜 |
+| 🎲 趣味文本 | 26 | 随机一言、毒鸡汤、绕口令、歇后语 |
+| 🤖 AI 能力 | 20 | AI 对话（兼容 OpenAI 格式）、AI 识图、AI 绘画、OCR、向量化 |
+| 🌤️ 生活查询 | 8 | 天气、油价、世界时间、手机号归属地 |
 
-> 完整接口列表：[api.tinyaii.top/apis](https://api.tinyaii.top/apis)
+> 每个接口都有独立的参数说明页：`https://api.tinyaii.cn/apis/{接口名}`
+>
+> 完整列表见 [开发文档](https://api.tinyaii.cn/docs)
 
 ---
 
 ## 技术栈
 
-- **后端**: Rust (Axum) + PostgreSQL
-- **前端**: 纯 HTML/CSS/JS SPA
-- **移动端**: Flutter (相册项目)
-- **部署**: Nginx + Let's Encrypt HTTPS
-- **服务器**: 香港云服务器
+- **后端**：Rust（Axum）+ PostgreSQL
+- **前端**：原生 HTML / CSS / JS，无框架
+- **部署**：Nginx 反向代理 + Let's Encrypt HTTPS
+- **鉴权**：API Key（请求头或 URL 参数）
+
+---
+
+## 使用说明
+
+- 接口以免费为主，注册后获得每日基础调用额度
+- 部分高频或高成本接口有单独的额度限制，具体见各接口文档
+- 所有接口为标准 HTTP，任何语言都能调用（JavaScript / Python / Go / PHP / C# 等）
+- 数据部分来自第三方上游，商业使用请自行确认各数据源的授权条款
 
 ---
 
 ## 文档
 
-- [开发者文档](https://api.tinyaii.top/docs)
-- [帮助中心](https://api.tinyaii.top/docs/help)
-- [API 分类列表](https://api.tinyaii.top/apis)
+- [开发文档](https://api.tinyaii.cn/docs) — 353 个接口的参数与返回说明
+- [帮助中心](https://api.tinyaii.cn/docs/help) — 调用方式与错误码
+- [完整接口索引](https://api.tinyaii.cn/docs#all-apis)
 
 ---
 
@@ -177,6 +169,6 @@ MIT License
 
 <div align="center">
 
-**[api.tinyaii.top](https://api.tinyaii.top)** · 免费 · 无限制 · 注册即用
+**[api.tinyaii.cn](https://api.tinyaii.cn)**
 
 </div>
